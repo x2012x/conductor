@@ -1,0 +1,1 @@
+The Conductor relies on Google's Text-To-Speech API and expects your Google API service account JSON file to be located at 'resources/config/google-tts.json'
