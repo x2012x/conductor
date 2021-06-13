@@ -26,7 +26,7 @@ When the Conductor receives an HTTP request, it will delegate to the registered 
 ## Getting Started
 
 **Required Libraries**
-* See the Pipfile for library requirements.
+* See the [Pipfile](Pipfile) for library requirements.
 * **NOTE:** The Conductor's TTS service relies on Google's [Text-To-Speech](https://cloud.google.com/text-to-speech) API and expects your Google API service account JSON file to be located at ['resources/config/google-tts.json'](src/resources/config/README.txt). The Conductor will fail to launch if this file is not present. If you would rather not use Google's TTS API, you'll have to swap out the TextToSpeechService class in ['services/tts.py'](src/services/tts.py) with another implementation.
 * In an attempt to reduce the number of Google TTS API calls, a cache of previously processed phrases is maintained at 'resources/cache/tts_cache'. In the future, I plan to add a scheduler service into the Conductor which will be leveraged to remove old cache entries but for now you'll need to manually maintain the cache to prevent it from growing uncontrolled (e.g. a CRON job to delete old files would do the trick).
 
