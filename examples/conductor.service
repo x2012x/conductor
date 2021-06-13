@@ -1,0 +1,12 @@
+[Unit]
+Description=Conductor service.
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/apps/conductor
+ExecStart=pipenv run python /home/pi/apps/conductor/conductor.py 0.0.0.0 8080
+ExecStop=/usr/bin/curl -X POST -G http://127.0.0.1:8080/admin/shutdown
+User=pi
+
+[Install]
+WantedBy=default.target
