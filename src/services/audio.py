@@ -98,7 +98,7 @@ class Player(threading.Thread):
         if self._background:
             time.sleep(delay)
             # Fade out the background volume
-            while self._background.volume != 0:
+            while self._background.volume > 0:
                 self._background.volume -= 0.5
                 time.sleep(0.10)
             self._background.stop()
