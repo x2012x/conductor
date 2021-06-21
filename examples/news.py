@@ -38,7 +38,7 @@ class NewsService(BaseService):
     ''' Service that plays the latest hourly NPR news feed '''
 
     def __init__(self, conductor):
-        super().__init__(conductor)
+        super().__init__(conductor, 'news')
         self._feed = 'https://feeds.npr.org/500005/podcast.xml'
         self._timeout = 3.00
         self._cache = 'resources/cache/news_cache'

@@ -114,7 +114,7 @@ class AudioService(BaseService):
         conductor (Conductor): reference to the running Conductor instance.
     ''' 
     def __init__(self, conductor):
-        super().__init__(conductor)
+        super().__init__(conductor, 'audio')
         self._queue = deque()
         self._player = None
         

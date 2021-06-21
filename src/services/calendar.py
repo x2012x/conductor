@@ -16,7 +16,7 @@ class CalendarService(BaseService):
         conductor (Conductor): reference to the running Conductor instance.
     ''' 
     def __init__(self, conductor):
-        super().__init__(conductor)
+        super().__init__(conductor, 'calendar')
         self._time_format = '%I %M %p'
         self._day_format = '%A %B %d'
         

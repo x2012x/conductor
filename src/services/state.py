@@ -13,7 +13,7 @@ class StateService(BaseService):
         conductor (Conductor): reference to the running Conductor instance.
     ''' 
     def __init__(self, conductor):
-        super().__init__(conductor)
+        super().__init__(conductor, 'state')
 
     def say_again(self):
         ''' Return the last collection of responses '''
