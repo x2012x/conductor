@@ -86,7 +86,7 @@ class Device():
 class ChromecastService(BaseService):
 
     def __init__(self, conductor):
-        super().__init__(conductor)
+        super().__init__(conductor, 'chromecast')
         self.devices = {k: Device(k, v) for (k, v) in DEVICES.items()}
         
     def stop(self, device, muted, force=False):

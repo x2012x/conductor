@@ -48,7 +48,7 @@ class RoutinesService(BaseService):
         conductor (Conductor): reference to the running Conductor instance.
     ''' 
     def __init__(self, conductor):
-        super().__init__(conductor)
+        super().__init__(conductor, 'routines')
         # Map of registered routines
         self._routines = {}
         self.__register_routine(Routine('good morning', self._good_morning))

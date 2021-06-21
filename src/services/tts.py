@@ -22,7 +22,7 @@ class TextToSpeechService(BaseService):
         conductor (Conductor): reference to the running Conductor instance.
     ''' 
     def __init__(self, conductor):
-        super().__init__(conductor)
+        super().__init__(conductor, 'tts')
         # Google TTS client
         self._client = texttospeech.TextToSpeechClient.from_service_account_file('resources/config/google-tts.json')
         # Google TTS voice configuration

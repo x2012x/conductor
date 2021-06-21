@@ -37,7 +37,7 @@ class LightsHandler(BaseHandler):
 class LightsService(BaseService):
 
     def __init__(self, conductor):
-        super().__init__(conductor)
+        super().__init__(conductor, 'lights')
         self.config = {LIFX: {'token': '<LIFX_API_TOKEN>'}} # TODO: Your LIFX API token is needed here.
         self._base_url = 'https://api.lifx.com/v1/lights/'
         self._timeout = 3.00

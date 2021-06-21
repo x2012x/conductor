@@ -10,9 +10,11 @@ class BaseService(object):
     
     Arguments:
         conductor (Conductor): reference to the running Conductor instance.
+        name (str): name of the service, also used as the service attribute name on the Conductor.
     ''' 
-    def __init__(self, conductor):
+    def __init__(self, conductor, name):
         self.conductor = conductor
+        self.name = name
 
 
 class ResponseText(object):

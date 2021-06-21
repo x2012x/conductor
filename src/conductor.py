@@ -41,33 +41,41 @@ class Conductor(ServerImpl):
     
     Arguments:
         server_address ((str,int)): tuple representing the IP and Port to listen on.
-        handlers ([BaseHandler]): collection of class definitions all derived from BaseHandler.   
+        services ([BaseService]): collection of class definitions all derived from BaseService.
+        handlers ([BaseHandler]): collection of class definitions all derived from BaseHandler.
     '''    
-    def __init__(self, server_address, handlers):
+    def __init__(self, server_address, services, handlers):
         super().__init__(server_address, RequestHandler)
-        # All available services should be defined as distinct attributes on the Conductor.
-        self.audio = AudioService(self)
-        self.calendar = CalendarService(self)
-        self.routines = RoutinesService(self)
-        self.state = StateService(self)
-        self.tts = TextToSpeechService(self)
+        # Register all services
+        for service in services:
+            self.register_service(service(self))
         # Map of registered handlers
         self.handlers = {}
         for handler in handlers:
-            self.register(handler(self))
+            self.register_handler(handler(self))
         # Tracks the last collection of responses that were processed.
         self.last_response = None
         
     def shutdown(self):
         '''Shutdown the Conductor HTTP service'''
         self.audio.shutdown()
-        super().shutdown()        
+        super().shutdown()
 
-    def register(self, handler):
+    def register_service(self, service):
+        ''' Register the supplied service with the conductor
+
+        Arguments:
+            service (BaseService): an object derived from BaseService.        
+        '''
+        if hasattr(self, service.name):
+            raise RegistrationExists(f'Service already registered: {service.name}')
+        setattr(self, service.name, service)
+
+    def register_handler(self, handler):
         ''' Register the supplied handler with the conductor
 
         Arguments:
-            handler (BaseHandler): a class definition derived from BaseHandler.        
+            handler (BaseHandler): an object derived from BaseHandler.        
         '''
         if handler.base_path in self.handlers:
             raise RegistrationExists(f'Path already registered: {handler.base_path}')
@@ -194,8 +202,9 @@ if __name__ == '__main__':
     parser.add_argument('address', type=str, help='IP address to bind to')
     parser.add_argument('port', type=int, help='Port to listen on')
     args = parser.parse_args()
-    server = Conductor((args.address, args.port), (AdministrationHandler, StateHandler, CalendarHandler,
-                                                   RoutinesHandler, AudioHandler, TextToSpeechHandler))
+    server = Conductor((args.address, args.port),
+                       (AudioService, CalendarService, RoutinesService, StateService, TextToSpeechService), 
+                       (AdministrationHandler, StateHandler, CalendarHandler, RoutinesHandler, AudioHandler, TextToSpeechHandler))
     server.serve_forever()
     # TODO: Get rid of prints and add a logger.
     print('Conductor shutdown')
