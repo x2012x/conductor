@@ -130,3 +130,6 @@ dmypy.json
 
 # Conductor cache contents
 src/resources/cache/
+
+# Conductor google service account file
+src/resources/config/google-tts.json
