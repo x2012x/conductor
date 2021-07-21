@@ -3,9 +3,11 @@ Created on Jun 4, 2021
 
 @author: x2012x
 '''
+import logging
 from handlers.base import BaseHandler
 from services.base import Response
 
+logger = logging.getLogger(__name__)
 
 class TextToSpeechHandler(BaseHandler):
     ''' Handler for processing TTS requests '''
@@ -22,8 +24,7 @@ class TextToSpeechHandler(BaseHandler):
         try:
             self.conductor.tts.speak(text_content)
         except Exception as e:
-            # TODO: Get rid of prints and add a logger.
-            print(f'Failed to speak request: {e}')
+            logger.error(f'Failed to speak request: {e}')
         return Response()
     
     def _handle_intent(self, intent):

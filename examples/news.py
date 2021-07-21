@@ -3,6 +3,7 @@ Created on Apr 25, 2021
 
 @author: x2012x
 '''
+import logging
 import os
 import requests
 import xml.etree.ElementTree as ET
@@ -12,6 +13,8 @@ from errors.reasons import get_general_failure
 from services.audio import PlayRequest
 from handlers.base import BaseHandler
 from errors.exceptions import SpeakableException
+
+logger = logging.getLogger(__name__)
 
 # Intents
 NEWS_LATEST = 'NewsLatest'
@@ -54,7 +57,7 @@ class NewsService(BaseService):
             with open(latest, 'wb') as f:
                 f.write(fetched_audio.content)
         else:
-            print(f'Playing audio from cache {latest}')
+            logger.info(f'Playing audio from cache {latest}')
         return latest
         
     def latest(self):

@@ -5,6 +5,7 @@ Created on Jun 24, 2021
 '''
 import traceback
 import json
+import logging
 from collections.abc import Iterable
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse
@@ -13,6 +14,7 @@ from errors.exceptions import UnsupportedAction, RegistrationExists,\
 from errors.reasons import get_reason
 from services.base import Response
 
+logger = logging.getLogger(__name__)
 
 # Prefer the ThreadingHTTPServer but fallback on HTTPServer if unavailable.
 try:
@@ -56,6 +58,7 @@ class Conductor(ServerImpl):
         Arguments:
             service (BaseService): an object derived from BaseService.        
         '''
+        logger.debug(f'Registering Service: {service.name}')
         if hasattr(self, service.name):
             raise RegistrationExists(f'Service already registered: {service.name}')
         setattr(self, service.name, service)
@@ -66,10 +69,12 @@ class Conductor(ServerImpl):
         Arguments:
             handler (BaseHandler): an object derived from BaseHandler.        
         '''
+        logger.debug(f'Registering Handler Path: {handler.base_path}')
         if handler.base_path in self.handlers:
             raise RegistrationExists(f'Path already registered: {handler.base_path}')
         self.handlers[handler.base_path] = handler
         for intent in handler.intents:
+            logger.debug(f'Registering Handler Intent: {intent}')
             if intent in self.handlers:
                 raise RegistrationExists(f'Intent already registered: {intent}')
             self.handlers[intent] = handler
@@ -149,8 +154,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         ''' Process the current request either by handling the supplied intent or requested path '''
         try:
             if intent:
-                # TODO: Get rid of prints and add a logger.
-                print(intent)
+                logger.info(f'Processing intent: {intent}')
                 # Locate the handler registered for this intent name and pass the intent to it for processing.
                 intent_name = intent['intent']['name']
                 if intent_name in self.server.handlers:
@@ -159,28 +163,25 @@ class RequestHandler(BaseHTTPRequestHandler):
                     raise UnsupportedIntent(f'Unkown intent: {intent_name}')
             # If an intent wasn't supplied, see if a handler is registered to process the path.
             else:
+                logger.info(f'Processing path: {self.path}')
                 parsed_path = urlparse(self.path)
                 path_components = parsed_path.path.split('/')            
                 if len(path_components) > 2 and path_components[1] in self.server.handlers:
                     response = self.server.handlers[path_components[1]].handle_action(path_components[2], parsed_path)
                 else:
                     raise UnsupportedAction(f'Unknown path: {parsed_path.path}')
-            # TODO: Get rid of prints and add a logger.                
-            print(f'Response: {response.toJSON()}')
+            logger.info(f'Sending response: {response.toJSON()}')
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             # Respond to the requestor with the response object in JSON format.
             self.wfile.write(response.toJSON().encode("utf_8"))
         except UnsupportedAction:
-            # TODO: Get rid of prints and add a logger.
-            print(f'Unsupported action: {self.path}\n{traceback.format_exc()}')
+            logger.error(f'Unsupported action: {self.path}\n{traceback.format_exc()}')
             self._send_unknown_req()
         except UnsupportedIntent:
-            # TODO: Get rid of prints and add a logger.
-            print(f'Unsupported intent: {intent}\n{traceback.format_exc()}')
+            logger.error(f'Unsupported intent: {intent}\n{traceback.format_exc()}')
             self._send_unknown_req()
         except Exception:
-            # TODO: Get rid of prints and add a logger.
-            print(f'Error processing request: {self.path}\n{traceback.format_exc()}')
+            logger.error(f'Error processing request: {self.path}\n{traceback.format_exc()}')
             self._send_server_error()

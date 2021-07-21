@@ -4,6 +4,15 @@ Created on Dec 27, 2020
 @author: x2012x
 '''
 import argparse
+import logging
+import logging.config
+from pathlib import Path
+
+# Ensure the logs directory exists and then configure logging
+Path('resources/logs').mkdir(parents=True, exist_ok=True)
+logging.config.fileConfig('resources/config/logging.conf')
+logger = logging.getLogger()
+
 from handlers.administration import AdministrationHandler
 from handlers.audio import AudioHandler
 from handlers.calendar import CalendarHandler
@@ -26,6 +35,6 @@ if __name__ == '__main__':
     server = Conductor((args.address, args.port),
                        (AudioService, CalendarService, RoutinesService, StateService, TextToSpeechService), 
                        (AdministrationHandler, StateHandler, CalendarHandler, RoutinesHandler, AudioHandler, TextToSpeechHandler))
+    logger.info(f'Conductor listening on {args.address}:{args.port}')
     server.serve_forever()
-    # TODO: Get rid of prints and add a logger.
-    print('Conductor shutdown')
+    logger.info('Conductor shutdown')

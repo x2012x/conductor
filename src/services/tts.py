@@ -3,6 +3,7 @@ Created on Apr 3, 2021
 
 @author: x2012x
 '''
+import logging
 from google.cloud import texttospeech
 import hashlib
 import os
@@ -11,6 +12,8 @@ from services.base import BaseService
 from errors.reasons import get_general_failure
 from services.audio import PlayRequest
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 class TextToSpeechService(BaseService):
     ''' Provides access to TTS service operations.
@@ -62,8 +65,7 @@ class TextToSpeechService(BaseService):
         '''        
         # Check for Google TTS max characters before transmitting request
         if len(text_content) > self._character_limit:
-            # TODO: Get rid of prints and add a logger.
-            print('Text to speak exceeds TTS character limit')
+            logger.error('Text to speak exceeds TTS character limit')
             raise TTSFailure(get_general_failure())
         try:
             # Get hash of the text_content being spoken.
@@ -77,15 +79,12 @@ class TextToSpeechService(BaseService):
                 response = self._client.synthesize_speech(input=synthesis_input, voice=self._voice, audio_config=self._audio_config)
                 with open(audio_file, "wb") as out:
                     out.write(response.audio_content)
-                    # TODO: Get rid of prints and add a logger.
-                    print(f'Created new recording at {audio_file}')
+                    logger.debug(f'Created new recording at {audio_file}')
                 with open(text_file, "w") as out:
                     out.write(text_content)
-                    # TODO: Get rid of prints and add a logger.
-                    print(f'Created transcription at {text_file}')
+                    logger.debug(f'Created transcription at {text_file}')
             else:
-                # TODO: Get rid of prints and add a logger.
-                print(f'Playing audio from cache {audio_file}')
+                logger.info(f'Playing audio from cache {audio_file}')
             # Send a PlayRequest to the audio service to play the TTS audio and optional background track.
             self.conductor.audio.play(PlayRequest(audio_file, background_audio, background_volume_shift = background_volume_shift))
         except Exception:

@@ -133,3 +133,6 @@ src/resources/cache/
 
 # Conductor google service account file
 src/resources/config/google-tts.json
+
+# Conductor logs dir
+src/resources/logs/

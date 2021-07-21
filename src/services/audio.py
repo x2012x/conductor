@@ -3,12 +3,14 @@ Created on Apr 3, 2021
 
 @author: x2012x
 '''
+import logging
 import time
 import threading
 from collections import deque
 from services.base import BaseService
 from audioplayer import AudioPlayer
 
+logger = logging.getLogger(__name__)
 
 class PlayRequest(object):
     ''' Defines parameters for an audio playback request
@@ -48,6 +50,7 @@ class Player(threading.Thread):
         ''' NOTE: Until state can be obtained from audioplayer, or a different lib 
             is used, stopping the Player will only stop processing the queue. The 
             current request track will still be finished.'''
+        logger.debug('Stop processing player queue')
         self._process_queue = False
         
     def run(self):
@@ -59,8 +62,7 @@ class Player(threading.Thread):
                 break
             finally:
                 time.sleep(0.10)
-        # TODO: Get rid of prints and add a logger.
-        print('Player stopped')
+        logger.debug('Player stopped')
     
     def _play(self, primary, background = None, delay = 2.5, background_volume_shift = 20):
         ''' Play a primary track, with optional background track. If a background track 
@@ -79,10 +81,12 @@ class Player(threading.Thread):
         self._primary = AudioPlayer(primary)
         self._primary.volume = self._volume
         if background:
+            logger.debug(f'Playing background track: {background}')
             self._background = AudioPlayer(background)
             self._background.volume = self._volume - background_volume_shift
             self._background.play(loop = True)
             time.sleep(delay)
+        logger.debug(f'Playing primary track: {primary}')            
         self._primary.play(block = True)
         self._stop_playback()
         
@@ -93,10 +97,12 @@ class Player(threading.Thread):
             delay (int): amount of time in seconds to wait before stopping the background track
         '''
         if self._primary:
+            logger.debug('Stopping primary track')
             self._primary.stop()
             self._primary.close()
         if self._background:
             time.sleep(delay)
+            logger.debug('Stopping background track')
             # Fade out the background volume
             while self._background.volume > 0:
                 self._background.volume -= 0.5

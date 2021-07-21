@@ -3,12 +3,14 @@ Created on Dec 30, 2020
 
 @author: x2012x
 '''
+import logging
 from urllib.parse import parse_qs
 from inspect import signature, Parameter
 from errors.exceptions import UnsupportedAction, SpeakableException
 from abc import abstractmethod, ABC
 from services.base import Response
 
+logger = logging.getLogger(__name__)
 
 class BaseHandler(ABC):
     '''
@@ -49,6 +51,7 @@ class BaseHandler(ABC):
                 method = getattr(self, action)
                 # Map method arguments to params in the request query. If an argument has a default and it is not specified in the query, use the default.
                 args = [param.default if param.name not in query and param.default != Parameter.empty else query[param.name][0] for param in signature(method).parameters.values()]
+                logger.debug(f'Invoking action {action} with args {args}')
                 response = method(*args)
             except SpeakableException as e:
                 response.speech.text = e.phrase

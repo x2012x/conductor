@@ -3,6 +3,7 @@ Created on Dec 31, 2020
 
 @author: x2012x
 '''
+import logging
 import pychromecast
 import threading
 import time
@@ -10,6 +11,8 @@ from handlers.base import BaseHandler
 from services.base import BaseService, Response
 from errors.exceptions import SpeakableException
 from errors.reasons import get_general_failure
+
+logger = logging.getLogger(__name__)
 
 # Intents
 STOP_VIDEO = 'StopVideo'
@@ -56,7 +59,7 @@ def stop_on_device(device, muted, force):
         time.sleep(3)
         device.previous_media = None
     else:
-        print('Skipping stop: Content ID unknown')
+        logger.error('Skipping stop: Content ID unknown')
         
         
 def action_on_device(device, action):
@@ -65,14 +68,14 @@ def action_on_device(device, action):
         if cc.media_controller.status.player_is_paused:
             cc.media_controller.play()
         else:
-            print('Skipping play: Not currently paused.')
+            logger.warn('Skipping play: Not currently paused.')
     elif action == 'pause':
         if cc.media_controller.status.player_is_playing:
             cc.media_controller.pause()
         else:
-            print('Skipping pause: Not currently playing.')
+            logger.warn('Skipping pause: Not currently playing.')
     else:
-        print(f'Skipping {action}: Action unknown.')
+        logger.error(f'Skipping {action}: Action unknown.')
         
 
 class Device():
