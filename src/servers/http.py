@@ -37,6 +37,8 @@ class Conductor(ServerImpl):
     '''    
     def __init__(self, server_address, services, handlers):
         super().__init__(server_address, RequestHandler)
+        # Keep track of registered service names
+        self.services = set()
         # Register all services
         for service in services:
             self.register_service(service(self))
@@ -49,7 +51,10 @@ class Conductor(ServerImpl):
         
     def shutdown(self):
         '''Shutdown the Conductor HTTP service'''
-        self.audio.shutdown()
+        # Shutdown all services before shutting down the Conductor
+        for service in self.services:
+            if hasattr(self, service):
+                getattr(self, service).shutdown()
         super().shutdown()
 
     def register_service(self, service):
@@ -62,6 +67,7 @@ class Conductor(ServerImpl):
         if hasattr(self, service.name):
             raise RegistrationExists(f'Service already registered: {service.name}')
         setattr(self, service.name, service)
+        self.services.add(service.name)
 
     def register_handler(self, handler):
         ''' Register the supplied handler with the conductor

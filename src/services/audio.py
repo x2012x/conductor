@@ -124,7 +124,7 @@ class AudioService(BaseService):
         self._queue = deque()
         self._player = None
         
-    def shutdown(self):
+    def _shutdown(self):
         ''' Clear the play queue and stop the player. '''
         self._queue.clear()
         if self._player and self._player.is_alive():

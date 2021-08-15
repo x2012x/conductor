@@ -4,6 +4,9 @@ Created on Apr 17, 2021
 @author: x2012x
 '''
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 class BaseService(object):
     ''' Base class that all Services should be derived from.
@@ -15,6 +18,14 @@ class BaseService(object):
     def __init__(self, conductor, name):
         self.conductor = conductor
         self.name = name
+
+    def shutdown(self):
+        logger.debug(f'Shutting down Service: {self.name}')
+        self._shutdown()
+
+    def _shutdown(self):
+        ''' Implementing class's shutdown logic '''
+        pass    
 
 
 class ResponseText(object):
