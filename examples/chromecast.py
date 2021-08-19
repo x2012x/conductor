@@ -60,6 +60,7 @@ def stop_on_device(device, muted, force):
         device.previous_media = None
     else:
         logger.error('Skipping stop: Content ID unknown')
+    cc.disconnect()
         
         
 def action_on_device(device, action):
@@ -76,6 +77,7 @@ def action_on_device(device, action):
             logger.warn('Skipping pause: Not currently playing.')
     else:
         logger.error(f'Skipping {action}: Action unknown.')
+    cc.disconnect()
         
 
 class Device():
