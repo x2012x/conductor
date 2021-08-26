@@ -1,6 +1,6 @@
 # Conductor
 
-The Conductor is a Python HTTP service that enables developers to register Handlers for processing Intents received from [Rhasspy](https://github.com/rhasspy/rhasspy). In addition to Rhasspy Intent processing, Handlers are also registered to process basic HTTP requests. I originally built the Conductor for several home automation projects and have decided to share the framework for others to use.
+The Conductor is a Python HTTP service that enables developers to register Handlers for processing Intents received from [Rhasspy](https://github.com/rhasspy/rhasspy). In addition to Rhasspy Intent processing, Handlers are also registered to process basic HTTP requests. I originally built the Conductor for several personal home automation projects (e.g. [Hogwarts Assistant](https://photos.app.goo.gl/fSMgCxvS8UNeYUL49)) and have decided to share the framework for others to use.
 
 ## Built-Ins
 There are a few built-in Handlers & Services provided with the base project but the expectation is that developers will create new ones to meet their project's specific needs. Some basic examples are also provided for reference purposes.
