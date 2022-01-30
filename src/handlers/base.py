@@ -30,6 +30,30 @@ class BaseHandler(ABC):
         self.conductor = conductor
         self.base_path = base_path
         self.intents = intents
+
+    def _convert_param(self, param):
+        ''' Infer the parameter data type and return the converted value '''
+        # Assume the param has already been converted, if not a string
+        if not isinstance(param, str):
+            return param
+        # Attempt integer conversion
+        try:
+            return int(param)
+        except:
+            logger.debug(f'Cannot convert {param} to int')
+        # Attempt float conversion
+        try:
+            return float(param)
+        except:
+            logger.debug(f'Cannot convert {param} to float')
+        # Attempt boolean conversion
+        TRUE = 'true'
+        FALSE = 'false'
+        param_lower = param.lower()
+        if param_lower in [TRUE, FALSE]:
+            return param_lower == TRUE
+        # No conversion possible, return unconverted
+        return param
         
     def handle_action(self, action, request):
         ''' Process a requested action
@@ -47,12 +71,25 @@ class BaseHandler(ABC):
         if hasattr(self, action):
             response = Response()
             try:
-                query = parse_qs(request.query)
+                # Handlers only support single value query parameters.
+                query = {k : self._convert_param(v[0]) for k, v in parse_qs(request.query).items()}
                 method = getattr(self, action)
-                # Map method arguments to params in the request query. If an argument has a default and it is not specified in the query, use the default.
-                args = [param.default if param.name not in query and param.default != Parameter.empty else query[param.name][0] for param in signature(method).parameters.values()]
-                logger.debug(f'Invoking action {action} with args {args}')
-                response = method(*args)
+                uses_kwargs = False
+                # Process query params to positional method args.
+                args = []
+                for param in signature(method).parameters.values():
+                    # Track if the target method supports variable kwargs
+                    if param.kind == Parameter.VAR_KEYWORD:
+                        uses_kwargs = True
+                    else:
+                        # If an argument has a default value and it is not specified in the query parameters, use the default.
+                        args.append(param.default if param.name not in query and param.default != Parameter.empty else query.pop(param.name))
+                if uses_kwargs:
+                    logger.debug(f'Invoking action {action} with args {args} and kwargs {query}')
+                    response = method(*args, **query)
+                else:
+                    logger.debug(f'Invoking action {action} with args {args}')
+                    response = method(*args)
             except SpeakableException as e:
                 response.speech.text = e.phrase
             return self.conductor.process_response(response)

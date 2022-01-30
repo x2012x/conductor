@@ -31,15 +31,15 @@ class ChromecastHandler(BaseHandler):
     def __init__(self, conductor):
         super().__init__(conductor, 'chromecast', {STOP_VIDEO, VIDEO_ACTION})
         
-    def stop(self, device, muted, force='False'):
-        return self.conductor.chromecast.stop(device, (muted.lower() == 'true'), (force.lower() == 'true'))
+    def stop(self, device, muted, force=False):
+        return self.conductor.chromecast.stop(device, muted, force)
     
     def action(self, device, action):
         return self.conductor.chromecast.action(device, action)
         
     def _handle_intent(self, intent):
         if intent['intent']['name'] == STOP_VIDEO:
-            return self.stop(LIVING_ROOM, 'False', 'True')
+            return self.stop(LIVING_ROOM, False, True)
         elif intent['intent']['name'] == VIDEO_ACTION:
             return self.action(LIVING_ROOM, intent['slots']['action'])
         
