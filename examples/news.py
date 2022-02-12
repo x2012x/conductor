@@ -8,6 +8,7 @@ import os
 import requests
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from utils.configuration import config
 from services.base import BaseService, Response
 from errors.reasons import get_general_failure
 from services.audio import PlayRequest
@@ -42,8 +43,8 @@ class NewsService(BaseService):
 
     def __init__(self, conductor):
         super().__init__(conductor, 'news')
-        self._feed = 'https://feeds.npr.org/500005/podcast.xml'
-        self._timeout = 3.00
+        self._feed = config['application']['NPR']['podcast']['url']
+        self._timeout = config['application']['NPR']['podcast']['timeout']
         self._cache = 'resources/cache/news_cache'
         Path(self._cache).mkdir(parents=True, exist_ok=True)
         

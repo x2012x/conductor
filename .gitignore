@@ -134,5 +134,8 @@ src/resources/cache/
 # Conductor google service account file
 src/resources/config/google-tts.json
 
+# Conductor protected config file
+src/resources/config/protected.yaml
+
 # Conductor logs dir
 src/resources/logs/

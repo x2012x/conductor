@@ -4,6 +4,7 @@ Created on Dec 30, 2020
 @author: x2012x
 '''
 import requests
+from utils.configuration import config
 from handlers.base import BaseHandler
 from services.base import BaseService, Response
 from errors.reasons import get_general_failure
@@ -14,7 +15,7 @@ CHANGE_LIGHT_STATE = 'ChangeLightState'
 
 LIFX = 'lifx'
 HOUSE = 'house'
-LIGHTS = {LIFX: {HOUSE: 'location_id:XXXXXXXXXXXXXXXXXXXXXXXXX'}} # TODO: Your LIFX house location_id is needed here.
+LIGHTS = {LIFX: {HOUSE: config['protected']['LIFX']['selectors']['house']}} # TODO: Define your LIFX house selector in the protected.yaml config.
 
 
 class LightFailure(SpeakableException):
@@ -38,16 +39,16 @@ class LightsService(BaseService):
 
     def __init__(self, conductor):
         super().__init__(conductor, 'lights')
-        self.config = {LIFX: {'token': '<LIFX_API_TOKEN>'}} # TODO: Your LIFX API token is needed here.
-        self._base_url = 'https://api.lifx.com/v1/lights/'
-        self._timeout = 3.00
+        self.config = {LIFX: {'token': config['protected']['LIFX']['api_token']}} # TODO: Define your LIFX API token in the protected.yaml config.
+        self._base_url = config['application']['LIFX']['url']
+        self._timeout = config['application']['LIFX']['timeout']
         
     def _lifx_headers(self):
         return {'Authorization': f'Bearer {self.config[LIFX]["token"]}'}        
         
     def power(self, lights, duration, power):
         try:
-            lifx_url = f'{self._base_url}{LIGHTS[LIFX][lights]}/state'
+            lifx_url = f'{self._base_url}/{LIGHTS[LIFX][lights]}/state'
             requests.put(lifx_url, 
                          params = {'duration': duration,
                                    'power': power},

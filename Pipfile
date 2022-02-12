@@ -9,6 +9,7 @@ audioplayer = "*"
 google-cloud-texttospeech = "*"
 pycairo = "*"
 pygobject = "*"
+pyyaml = "*"
 
 [dev-packages]
 

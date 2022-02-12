@@ -1,0 +1,13 @@
+application:
+  LIFX:
+    url: https://api.lifx.com/v1/lights
+    timeout: 3.00
+  NPR:
+    podcast:
+      url: https://feeds.npr.org/500005/podcast.xml
+      timeout: 3.00
+  Chromecast:
+    cooldown: 3
+    devices:
+      living_room:
+        ip: 0.0.0.0

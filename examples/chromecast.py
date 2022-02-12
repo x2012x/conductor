@@ -11,6 +11,7 @@ from handlers.base import BaseHandler
 from services.base import BaseService, Response
 from errors.exceptions import SpeakableException
 from errors.reasons import get_general_failure
+from utils.configuration import config
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,7 @@ STOP_VIDEO = 'StopVideo'
 VIDEO_ACTION = 'VideoAction'
 
 LIVING_ROOM = 'living_room'
-DEVICES = {LIVING_ROOM: '0.0.0.0'} # TODO: Your living room Chromecast's IP.
+DEVICES = {LIVING_ROOM: config['application']['Chromecast']['devices']['living_room']['ip']}
 
 
 class ChromecastFailure(SpeakableException):
@@ -56,7 +57,7 @@ def stop_on_device(device, muted, force):
     if cc.media_controller.status.content_id == device.previous_media or force:
         cc.quit_app()
         cc.set_volume_muted(muted)
-        time.sleep(3)
+        time.sleep(config['application']['Chromecast']['cooldown'])
         device.previous_media = None
     else:
         logger.error('Skipping stop: Content ID unknown')
